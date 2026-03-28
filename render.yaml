@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: oms-gateway
+    env: node
+    region: ohio
+    buildCommand: npm install
+    startCommand: node src/server.js
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: JWT_SECRET
+        sync: false
+      - key: AUTH_SERVICE_URL
+        sync: false
+      - key: ORDERS_SERVICE_URL
+        sync: false
+      - key: LABEL_SERVICE_URL
+        sync: false
+      - key: WALMART_SERVICE_URL
+        sync: false
+      - key: ALLOWED_ORIGIN
+        sync: false
