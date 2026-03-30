@@ -117,11 +117,15 @@ app.use(
 );
 
 // /labels/* → LABEL_SERVICE_URL
+// parseReqBody: false is required for multipart/form-data (PDF uploads) —
+// without it express-http-proxy consumes the body stream before forwarding,
+// corrupting the multipart boundary and causing FastAPI to return 400.
 app.use(
   '/labels',
   proxy(process.env.LABEL_SERVICE_URL, {
     proxyReqPathResolver: (req) => '/labels' + req.url,
     proxyReqOptDecorator: injectUserHeaders,
+    parseReqBody: false,
   })
 );
 
