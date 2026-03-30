@@ -18,8 +18,10 @@ app.use(morgan('combined'));
 
 // ---------------------------------------------------------------------------
 // Security headers
+// Disable CSP on the gateway — it proxies redirects to Google OAuth which
+// uses inline scripts. CSP on a pure API gateway adds no security benefit.
 // ---------------------------------------------------------------------------
-app.use(helmet());
+app.use(helmet({ contentSecurityPolicy: false }));
 
 // ---------------------------------------------------------------------------
 // CORS
