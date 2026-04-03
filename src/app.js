@@ -126,6 +126,7 @@ app.use(
     proxyReqPathResolver: (req) => '/labels' + req.url,
     proxyReqOptDecorator: injectUserHeaders,
     parseReqBody: false,
+    timeout: 90000,
   })
 );
 
