@@ -116,17 +116,25 @@ app.use(
   })
 );
 
-// /labels/* → LABEL_SERVICE_URL
-// parseReqBody: false is required for multipart/form-data (PDF uploads) —
-// without it express-http-proxy consumes the body stream before forwarding,
-// corrupting the multipart boundary and causing FastAPI to return 400.
+// /labels/upload → LABEL_SERVICE_URL (multipart — must NOT parse body)
+// parseReqBody: false prevents express-http-proxy from consuming the
+// multipart stream so FastAPI receives valid multipart boundaries.
+app.use(
+  '/labels/upload',
+  proxy(process.env.LABEL_SERVICE_URL, {
+    proxyReqPathResolver: (req) => '/labels/upload' + req.url,
+    proxyReqOptDecorator: injectUserHeaders,
+    parseReqBody: false,
+    timeout: 90000,
+  })
+);
+
+// /labels/* → LABEL_SERVICE_URL (JSON endpoints — normal body parsing)
 app.use(
   '/labels',
   proxy(process.env.LABEL_SERVICE_URL, {
     proxyReqPathResolver: (req) => '/labels' + req.url,
     proxyReqOptDecorator: injectUserHeaders,
-    parseReqBody: false,
-    timeout: 90000,
   })
 );
 
@@ -136,6 +144,7 @@ app.use(
   proxy(process.env.WALMART_SERVICE_URL, {
     proxyReqPathResolver: (req) => '/walmart' + req.url,
     proxyReqOptDecorator: injectUserHeaders,
+    timeout: 60000,
   })
 );
 
