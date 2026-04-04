@@ -119,10 +119,14 @@ app.use(
 // /labels/upload → LABEL_SERVICE_URL (multipart — must NOT parse body)
 // parseReqBody: false prevents express-http-proxy from consuming the
 // multipart stream so FastAPI receives valid multipart boundaries.
+// proxyReqPathResolver returns '/labels/upload' exactly — never with a
+// trailing slash — so FastAPI does not 307-redirect (which would cause the
+// client to follow the redirect directly to the label service, bypassing the
+// gateway and losing the X-User-Id / X-User-Role headers → 401).
 app.use(
   '/labels/upload',
   proxy(process.env.LABEL_SERVICE_URL, {
-    proxyReqPathResolver: (req) => '/labels/upload' + req.url,
+    proxyReqPathResolver: () => '/labels/upload',
     proxyReqOptDecorator: injectUserHeaders,
     parseReqBody: false,
     timeout: 90000,
